@@ -80,7 +80,7 @@ def train_mlp(
     print(f'Train size: {X["train"].shape}, Val size {X["val"].shape}')
 
     if params is None:
-        params = lib.load_json(f"/home/rototo/tab-diffusion/tuned_models/mlp/{Path(real_data_path).name}_cv.json")
+        params = lib.load_json(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tuned_models", "mlp", f"{Path(real_data_path).name}_cv.json"))
 
     mlp_params = {}
     if params is not None:
@@ -105,6 +105,7 @@ def train_mlp(
 
     train_ds = SkDataset(X = X["train"].to_numpy(), y = y["train"])
     val_ds = SkDataset(X = X["val"].to_numpy(), y = y["val"])
+    es = EarlyStopping(monitor="valid_loss", patience=16)
 
     print('-'*100)
 
@@ -128,7 +129,7 @@ def train_mlp(
             train_split=predefined_split(val_ds),
             iterator_train__shuffle=True,
             device=device,
-            callbacks=[EpochScoring(r2, lower_is_better=False)],
+            callbacks=[es, EpochScoring(r2, lower_is_better=False)],
         )
 
     else:
@@ -143,7 +144,7 @@ def train_mlp(
             train_split=predefined_split(val_ds),
             iterator_train__shuffle=True,
             device=device,
-            callbacks=[EpochScoring(f1, lower_is_better=False)],
+            callbacks=[es, EpochScoring(f1, lower_is_better=False)],
         )
 
     net.fit(
