@@ -24,7 +24,10 @@ class MetricsReport:
                 self._res[k]["f1"] = report[k]["macro avg"]["f1-score"]
                 if task_type == TaskType.BINCLASS:
                     self._res[k]["roc_auc"] = report[k]["roc_auc"]
+                    self._res[k]["confusion_matrix"] = report[k]["confusion_matrix"]
+                    
                     self._metrics_names.append("roc_auc")
+                    self._metrics_names.append("confusion_matrix")
 
         elif task_type == TaskType.REGRESSION:
             self._metrics_names = ["r2", "rmse"]
@@ -155,4 +158,5 @@ def calculate_metrics(
         )
         if task_type == TaskType.BINCLASS:
             result['roc_auc'] = skm.roc_auc_score(y_true, probs)
+            result['confusion_matrix'] = skm.confusion_matrix(y_true, labels).tolist()
     return result

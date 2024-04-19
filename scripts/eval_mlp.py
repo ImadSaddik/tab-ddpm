@@ -105,7 +105,6 @@ def train_mlp(
 
     train_ds = SkDataset(X = X["train"].to_numpy(), y = y["train"])
     val_ds = SkDataset(X = X["val"].to_numpy(), y = y["val"])
-    es = EarlyStopping(monitor="valid_loss", patience=16)
 
     print('-'*100)
 
@@ -129,7 +128,7 @@ def train_mlp(
             train_split=predefined_split(val_ds),
             iterator_train__shuffle=True,
             device=device,
-            callbacks=[es, EpochScoring(r2, lower_is_better=False)],
+            callbacks=[EpochScoring(r2, lower_is_better=False)],
         )
 
     else:
@@ -144,7 +143,7 @@ def train_mlp(
             train_split=predefined_split(val_ds),
             iterator_train__shuffle=True,
             device=device,
-            callbacks=[es, EpochScoring(f1, lower_is_better=False)],
+            callbacks=[EpochScoring(f1, lower_is_better=False)],
         )
 
     net.fit(
